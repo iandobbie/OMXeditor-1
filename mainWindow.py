@@ -21,8 +21,8 @@ import util
 
 
 ## This class defines the primary window for the application, which is always
-# open so long as the app is. Primarily, this window contains a set of tabs, 
-# each of which corresponds to a single ControlPanel and contains controls 
+# open so long as the app is. Primarily, this window contains a set of tabs,
+# each of which corresponds to a single ControlPanel and contains controls
 # for modifying a single open MRC file. The actual views of the pixel data
 # in the file are handled by the ControlPanel instance.
 class MainWindow(wx.Frame):
@@ -31,7 +31,7 @@ class MainWindow(wx.Frame):
 
         self.auiManager = wx.aui.AuiManager()
         self.auiManager.SetManagedWindow(self)
-        wx.MenuBar.SetAutoWindowMenu(False)  # disable "Windows" menu
+    #    wx.MenuBar.WindowMenu(False)  # disable "Windows" menu
         self.menuBar = wx.MenuBar()
 
         fileMenu = wx.Menu()
@@ -44,13 +44,13 @@ class MainWindow(wx.Frame):
                 self.OnLoadParams)
         util.addMenuItem(self, fileMenu, '&Export parameters...\tCtrl+E',
                 self.OnExportParams)
-        util.addMenuItem(self, fileMenu, '&Quit\tCtrl+Q', 
+        util.addMenuItem(self, fileMenu, '&Quit\tCtrl+Q',
                 self.OnQuit)
 
         viewMenu = wx.Menu()
         self.menuBar.Append(viewMenu, 'View')
         viewMenu.AppendSeparator()
-        util.addMenuItem(self, viewMenu, '&Show view controls\tCtrl+T', 
+        util.addMenuItem(self, viewMenu, '&Show view controls\tCtrl+T',
                 self.OnViewControls)
 
         editMenu = wx.Menu()
@@ -85,7 +85,7 @@ class MainWindow(wx.Frame):
     def OnQuit(self, event = None):
         self.Destroy()
 
-        
+
     def CreateNotebook(self):
         self.controlPanelsNotebook = wx.aui.AuiNotebook(self, wx.ID_ANY, style=wx.aui.AUI_NB_DEFAULT_STYLE | wx.aui.AUI_NB_WINDOWLIST_BUTTON | wx.aui.AUI_NB_TAB_FIXED_WIDTH)
 
@@ -96,7 +96,7 @@ class MainWindow(wx.Frame):
         return self.controlPanelsNotebook
 
     def OnFileOpen(self,event = None):
-        dialog = wx.FileDialog(self, "Please select a file to open", 
+        dialog = wx.FileDialog(self, "Please select a file to open",
                                style = wx.FD_OPEN | wx.FD_MULTIPLE)
         if dialog.ShowModal() == wx.ID_OK:
             for file in dialog.GetPaths():
@@ -114,20 +114,20 @@ class MainWindow(wx.Frame):
         targetPath = self.updatePath(currPath,curPanel)
         permission = wx.CANCEL
         if targetPath == currPath:
-            permission = wx.MessageBox("Overwrite %s?" % targetPath, 
-                 "Please confirm", 
+            permission = wx.MessageBox("Overwrite %s?" % targetPath,
+                 "Please confirm",
                  style = wx.OK | wx.CANCEL)
         else:
             permission = wx.OK
         if permission != wx.OK:
             return
-                
+
         curPanel.dataDoc.alignAndCrop(savePath = targetPath)
 
         doc_to_edit = datadoc.DataDoc(targetPath)
 
         self.controlPanelsNotebook.DeletePage(pageIndex)
-        self.controlPanelsNotebook.InsertPage(pageIndex, 
+        self.controlPanelsNotebook.InsertPage(pageIndex,
                 ControlPanel(self, doc_to_edit),
                 os.path.basename(targetPath), select=True)
 
@@ -150,11 +150,11 @@ class MainWindow(wx.Frame):
             tags = tags + "_ECR"
         # 2. Will any alignment take place?
         alignParams = doc.alignParams
-        for wavelength in xrange(doc.numWavelengths):   
-            dx, dy, dz, angle, zoom = alignParams[wavelength]          
-            if dz and self.size[2] == 1:                                    
+        for wavelength in xrange(doc.numWavelengths):
+            dx, dy, dz, angle, zoom = alignParams[wavelength]
+            if dz and self.size[2] == 1:
                 dz = 0  # Chris' HACK: no Z translate in 2D files
-            if dx or dy or dz or angle or zoom != 1:                        
+            if dx or dy or dz or angle or zoom != 1:
                 tags = tags + "_EAL"
                 break
         return pathBase + tags + fileExt
@@ -164,7 +164,7 @@ class MainWindow(wx.Frame):
         curPanel = self.getCurPanel()
         if curPanel is None:
             return
-        
+
         pageIndex = self.controlPanelsNotebook.GetSelection()
 
         caption = self.controlPanelsNotebook.GetPageText(pageIndex)
@@ -180,7 +180,7 @@ class MainWindow(wx.Frame):
                     os.path.basename(targetPath), select=True)
 
 
-    ## This would be a decorator function if I could find a non-hacky way to 
+    ## This would be a decorator function if I could find a non-hacky way to
     # do decorators of instance methods, but since I can't, it just pops up a
     # message dialog if the user hasn't opened a file yet, and otherwise
     # returns True.
@@ -218,14 +218,14 @@ class MainWindow(wx.Frame):
         if self.requireOpenFile():
             dialogs.ProjResizeDialog(
                 self.getCurPanel(), self.getCurPanel().dataDoc)
-    
+
 
     ## Passthrough to the current panel.
     def OnLoadParams(self, event):
         if self.requireOpenFile():
             self.getCurPanel().loadParameters()
 
-    
+
     ## Passthrough to the current panel.
     def OnExportParams(self, event):
         if self.requireOpenFile():
@@ -237,17 +237,17 @@ class MainWindow(wx.Frame):
         if self.requireOpenFile():
             dialogs.BatchDialog(self, self.getCurPanel())
 
-    
+
     def OnAbout(self, event = None):
-        wx.MessageDialog(self, 
+        wx.MessageDialog(self,
                 "This program is for viewing and editing MRC files. It " +
-                "allows you to align data across wavelengths, crop out " + 
+                "allows you to align data across wavelengths, crop out " +
                 "unnecessary pixels, and view the data from many different " +
-                "perspectives. Alignment and cropping parameters can also " + 
-                "be exported for use in the OMX Processor program.\n\n" + 
+                "perspectives. Alignment and cropping parameters can also " +
+                "be exported for use in the OMX Processor program.\n\n" +
                 "Copyright 2012 Sedat Lab, UCSF.\n" +
                 "(this version has been customized by Micron Oxford)",
-                "About OMX Editor", 
+                "About OMX Editor",
                 wx.ICON_INFORMATION | wx.OK | wx.STAY_ON_TOP).ShowModal()
 
 
@@ -258,7 +258,7 @@ class MainWindow(wx.Frame):
             return self.controlPanelsNotebook.GetPage(pageIndex)
         return None
 
-                
+
     def openFile(self, filename):
         ## if this file is already open, just go to that tab and return
         for i in range(self.controlPanelsNotebook.GetPageCount()):
@@ -274,10 +274,10 @@ class MainWindow(wx.Frame):
                     mrc_filename, doc_to_edit = self.openTiffAsMrc(filename)
                     filename = mrc_filename
                 else:
-                    doc_to_edit = datadoc.DataDoc(filename) 
+                    doc_to_edit = datadoc.DataDoc(filename)
             except Exception, e:
-                wx.MessageDialog(None, 
-                        "Failed to open file: %s\n\n%s" % (e, traceback.format_exc()), 
+                wx.MessageDialog(None,
+                        "Failed to open file: %s\n\n%s" % (e, traceback.format_exc()),
                         "Error", wx.OK).ShowModal()
                 return
 
@@ -340,7 +340,7 @@ class MainWindow(wx.Frame):
         self.statbar.SetFieldsCount(controlPanel.dataDoc.numWavelengths)
 
     def getDocs(self):
-        """ 
+        """
         Returns an up-to-date list of DataDoc references for all open files.
         """
         dataDocs = []
@@ -383,21 +383,21 @@ class ControlPanel(wx.Panel):
         ## Which wavelengths are controlled by the mouse
         self.mouseControlWavelengths = [False] * self.dataDoc.numWavelengths
         self.mouseControlWavelengths[0] = True
-        ## Tracks position of the mouse when it was clicked down, for 
+        ## Tracks position of the mouse when it was clicked down, for
         # transforming the image data
         self.initialMouseLoc = None
-        ## Original alignment parameters before the user started dragging 
+        ## Original alignment parameters before the user started dragging
         # the image around.
         self.initialAlignParams = None
 
-        ## Maps wavelength index to whether or not we're done aligning it, 
+        ## Maps wavelength index to whether or not we're done aligning it,
         # so we know when alignment has finished.
         self.alignedWavelengths = dict()
 
         ## Whether or not we are currently showing a "preview crop" of the
         # image.
         self.isViewCropped = False
-        
+
         ## List of windows holding different views of the data.
         self.windows = []
         # Check out DataDoc.size for the ordering of these axes.
@@ -406,7 +406,7 @@ class ControlPanel(wx.Panel):
             # Have more than one Z slice, so show the Z views.
             axes.extend([(4, 2), (2, 3)])
         for axesPair in axes:
-            self.windows.append(viewerWindow.ViewerWindow(self, 
+            self.windows.append(viewerWindow.ViewerWindow(self,
                             axes = axesPair,
                             dataDoc = self.dataDoc,
                     )
@@ -430,7 +430,7 @@ class ControlPanel(wx.Panel):
         ## List of canvases showing actual pixels, held in each window.
         self.viewers = [window.viewer for window in self.windows]
 
-        # Set up mouse events for the viewers so the user can control 
+        # Set up mouse events for the viewers so the user can control
         # alignment parameters by dragging.
         for viewer in self.viewers:
             viewer.Bind(wx.EVT_MOUSE_EVENTS, self.OnMouse)
@@ -459,7 +459,7 @@ class ControlPanel(wx.Panel):
 
         self.sizer.Add(self.makeWavelengthPanels())
 
-        ## Maps axes to whether or not the corresponding views are visible, 
+        ## Maps axes to whether or not the corresponding views are visible,
         # for the views that aren't shown by default.
         self.axesToVisibilityMap = dict()
         for viewer in self.viewers:
@@ -509,7 +509,7 @@ class ControlPanel(wx.Panel):
     def makeCropPanel(self):
         panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        
+
         self.cropControlPanel = CropControlPanel(
                 parent = panel, helpFunc = self.prepHelpText,
                 dimensions = self.dataDoc.size[1:][::-1],
@@ -520,9 +520,9 @@ class ControlPanel(wx.Panel):
         panel.SetSizerAndFit(sizer)
         return panel
 
-    
+
     ## Make the panel that holds alignment parameter panels for all
-    # wavelengths, as well as the wavelength histograms. This also creates 
+    # wavelengths, as well as the wavelength histograms. This also creates
     # self.alignParamsPanels, self.alignSwapButtons, and self.histograms
     def makeWavelengthPanels(self):
         panel = wx.Panel(self)
@@ -545,7 +545,7 @@ class ControlPanel(wx.Panel):
             # gb, Oct2012 - should really rename all wavelength names to channel
             #   "wavelength" below is just an arbitrary channel number
             trueWavelength = self.dataDoc.channelWaves[wavelength]
-            label = wx.StaticText(panel, -1, 
+            label = wx.StaticText(panel, -1,
                     "Channel %d (%d nm)" % (wavelength, trueWavelength) )
             columnSizer.Add(label, 0, wx.ALL, 3)
 
@@ -556,7 +556,7 @@ class ControlPanel(wx.Panel):
             self.prepHelpText(toggleButton, "Toggle On/Off",
                     "Click to toggle visibility for this wavelength.")
             toggleButton.SetValue(True)
-            toggleButton.Bind(wx.EVT_TOGGLEBUTTON, 
+            toggleButton.Bind(wx.EVT_TOGGLEBUTTON,
                     lambda event, wavelength = wavelength: self.toggleWavelengthVisibility(wavelength))
             buttonSizer.Add(toggleButton, 0, wx.ALL, 3)
 
@@ -564,9 +564,9 @@ class ControlPanel(wx.Panel):
 
             color = util.waveToRGB(self.dataDoc.channelWaves[wavelength])
             self.colors[wavelength] = color
-            newHistogram = histogram.HistogramPanel(panel, 
-                    self.changeHistScale, self.setHelpText, 
-                    wavelength, dataSlice[wavelength], color, 
+            newHistogram = histogram.HistogramPanel(panel,
+                    self.changeHistScale, self.setHelpText,
+                    wavelength, dataSlice[wavelength], color,
                     size = (176, 40)
             )
             self.histograms.append(newHistogram)
@@ -576,11 +576,11 @@ class ControlPanel(wx.Panel):
                 viewer.setColor(wavelength, color)
 
             rowSizer.Add(columnSizer)
-            
+
             initialParams = self.dataDoc.getAlignParams(wavelength)
             # This is called when parameters are changed.
             changeCallback = lambda wavelength = wavelength: self.setAlignParams(wavelength)
-            # This is called when the checkbox to modify parameters with the 
+            # This is called when the checkbox to modify parameters with the
             # mouse is clicked.
             checkCallback = lambda wavelength = wavelength: self.setMouseControl(wavelength)
             # This is called when the radio button to use this wavelength as
@@ -588,7 +588,7 @@ class ControlPanel(wx.Panel):
             radioCallback = lambda wavelength = wavelength: self.setAlignReference(wavelength)
             paramsPanel = AlignParamsPanel(panel, self.prepHelpText,
                     initialParams, changeCallback, checkCallback, radioCallback,
-                    isFirstPanel = wavelength == 0, 
+                    isFirstPanel = wavelength == 0,
                     style = wx.BORDER_SUNKEN)
             self.alignParamsPanels.append(paramsPanel)
 
@@ -632,15 +632,15 @@ class ControlPanel(wx.Panel):
                 self.parent, self))
         rowSizer.Add(batchButton, 0, wx.LEFT | wx.BOTTOM, 10)
         splitMergeButton = wx.Button(panel, -1, "Split/Merge")
-        self.prepHelpText(splitMergeButton, "Split/Merge data", 
+        self.prepHelpText(splitMergeButton, "Split/Merge data",
                 "Split, Merge or Re-order data - merge not yet implemented."
         )
         splitMergeButton.Bind(wx.EVT_BUTTON, lambda event: dialogs.SplitMergeDialog(
                 self, self.dataDoc))
         rowSizer.Add(splitMergeButton, 0, wx.LEFT | wx.BOTTOM, 10)
         projResizeButton = wx.Button(panel, -1, "Proj/Resize")
-        self.prepHelpText(projResizeButton, "Project/Resize data", 
-                "When finished, will allow averaging of phases & angles of " + 
+        self.prepHelpText(projResizeButton, "Project/Resize data",
+                "When finished, will allow averaging of phases & angles of " +
                 "raw SI data, and/or rescaling of the result. This should " +
                 "facilitate merging and comparison of SI and wide-field " +
                 "data for a given sample. Not yet implemented!"
@@ -726,7 +726,7 @@ class ControlPanel(wx.Panel):
 
         # remember, 'mag' should only apply to lateral dimensions, therefore
         # viewers[1] and viewers[2] needs different aspect ratios in x and y (see OnPaint())
-            
+
         # then update the sliced sections because of the translations (tx, ty, tz)
         self.dataDoc.setAlignParams(index, (tx, ty, tz, rot, mag))
         # Alignment parameters have changed, so we need to update our images.
@@ -734,7 +734,7 @@ class ControlPanel(wx.Panel):
         self.setViewerScalings()
 
 
-    ## Toggle whether or not a given wavelength can be manipulated with 
+    ## Toggle whether or not a given wavelength can be manipulated with
     # the mouse.
     def setMouseControl(self, index):
         self.mouseControlWavelengths[index] = not self.mouseControlWavelengths[index]
@@ -770,7 +770,7 @@ class ControlPanel(wx.Panel):
         # DataDoc indices (WTZYX) to align params indices (XYZ)
         xDir = 4 - viewer.axes[0]
         yDir = 4 - viewer.axes[1]
-        if ((event.LeftDown() or event.RightDown()) and 
+        if ((event.LeftDown() or event.RightDown()) and
                 self.initialMouseLoc is None):
             # Mouse clicked down; set the initial location and store our current
             # parameters so we can move relative to them.
@@ -781,7 +781,7 @@ class ControlPanel(wx.Panel):
             # Either translate or rotate the image
             params = numpy.array(self.initialAlignParams)
             delta = clickLoc - self.initialMouseLoc
-            
+
             if event.LeftIsDown():
                 # Translate, while accounting for the current image rotation
                 magnitude = numpy.sqrt(numpy.vdot(delta, delta))
@@ -809,24 +809,24 @@ class ControlPanel(wx.Panel):
                 if self.mouseControlWavelengths[i]:
                     self.alignParamsPanels[i].setParams(paramSet)
                     self.setAlignParams(i)
-            
+
         else:
             # No more mouse buttons down.
             self.initialMouseLoc = None
 
 
-    ## Generate an array of data that's been normalized to the range [0, 1] 
+    ## Generate an array of data that's been normalized to the range [0, 1]
     # and filtered by our histograms so values below/above the histogram
     # min/max are set to 0/1.
     def getFilteredData(self, wavelength, perpendicularAxes = (1, 2)):
         targetCoords = self.dataDoc.getSliceCoords(perpendicularAxes)
         baseData = self.dataDoc.takeSlice(targetCoords).astype(numpy.float)[wavelength]
-        
+
         dataMin = baseData.min()
         dataMax = baseData.max()
         histogram = self.histograms[wavelength]
         minCut, maxCut = histogram.getMinMax()
-        # This is an order of magnitude faster than using 
+        # This is an order of magnitude faster than using
         # scipy.ndimage.filters.generic_filter.
         baseData[numpy.where(baseData < minCut)] = dataMin
         baseData[numpy.where(baseData > maxCut)] = dataMax
@@ -841,8 +841,8 @@ class ControlPanel(wx.Panel):
 
         wavelengthsToAlign = range(self.dataDoc.numWavelengths)
         del wavelengthsToAlign[referenceIndex]
-        
-        # This datastructure will allow us to track which wavelengths have 
+
+        # This datastructure will allow us to track which wavelengths have
         # finished aligning.
         self.alignedWavelengths = dict([(i, False) for i in wavelengthsToAlign])
 
@@ -857,16 +857,16 @@ class ControlPanel(wx.Panel):
         for i in wavelengthsToAlign:
             if i == referenceIndex:
                 continue
-            
+
             guess = self.alignParamsPanels[i].getParamsList()
 
             # Only apply automatic guess adjustment if the user hasn't made
-            # their own adjustments already, to either the given data or 
+            # their own adjustments already, to either the given data or
             # the reference data.
             shouldAdjustGuess = True
             referenceParams = self.alignParamsPanels[referenceIndex].getParamsList()
             for j, val in enumerate([0, 0, 0, 0, 1]):
-                if (abs(guess[j] - val) > .01 or 
+                if (abs(guess[j] - val) > .01 or
                         abs(referenceParams[j] - val) > .01):
                     shouldAdjustGuess = False
                     break
@@ -876,7 +876,7 @@ class ControlPanel(wx.Panel):
 
 
     ## Return the wavelength being used as a reference (i.e. the wavelength
-    # that is held fixed, and that the other wavelengths adjust themselves 
+    # that is held fixed, and that the other wavelengths adjust themselves
     # to when auto-aligning).
     def getReferenceWavelength(self):
         for i, panel in enumerate(self.alignParamsPanels):
@@ -884,13 +884,13 @@ class ControlPanel(wx.Panel):
                 return i
 
 
-    ## Retrieve the 3D array for the specified wavelength, in addition to 
+    ## Retrieve the 3D array for the specified wavelength, in addition to
     # our reference wavelength, and pass them back to the worker.
     @util.callInMainThread
     def getFullVolume(self, wavelength, worker):
         reference = self.getReferenceWavelength()
         result = self.dataDoc.alignAndCrop(
-                wavelengths = [reference, wavelength], 
+                wavelengths = [reference, wavelength],
                 timepoints = [self.dataDoc.curViewIndex[1]])
         # Take the first timepoint.
         worker.setVolumes(result[0][0], result[1][0])
@@ -908,7 +908,7 @@ class ControlPanel(wx.Panel):
         self.alignProgressWindow.switchTo3D(wavelength)
 
 
-    ## Receive notification from one of the aligner threads that it's all 
+    ## Receive notification from one of the aligner threads that it's all
     # done.
     @util.callInMainThread
     def finishAutoAligning(self, result, wavelength):
@@ -926,13 +926,13 @@ class ControlPanel(wx.Panel):
         self.setAlignParams(wavelength)
 
 
-    ## The align progress frame has been destroyed, so we don't need to 
+    ## The align progress frame has been destroyed, so we don't need to
     # track it any more.
     def clearProgressFrame(self):
         self.alignProgressWindow = None
 
 
-    ## Calculate the centers of the beads and find out how well we have 
+    ## Calculate the centers of the beads and find out how well we have
     # aligned the different wavelengths.
     def checkAlignment(self):
         volumes = self.dataDoc.alignAndCrop(
@@ -965,7 +965,7 @@ class ControlPanel(wx.Panel):
                 c += 1
             print "Found",len(beadCenters),"beads"
             beadCentersByWavelength.append(beadCenters)
-        
+
         distances = []
         zDistances = []
         offsets = []
@@ -1011,10 +1011,10 @@ class ControlPanel(wx.Panel):
                 style = wx.FD_OPEN)
         if dialog.ShowModal() != wx.ID_OK:
             return
-        
+
         handle = open(dialog.GetPath(), 'r')
         cropParams = [1] * 8
-        cropLabelOrder = ['minX', 'maxX', 'minY', 'maxY', 'minZ', 'maxZ', 
+        cropLabelOrder = ['minX', 'maxX', 'minY', 'maxY', 'minZ', 'maxZ',
                 'minT', 'maxT']
         alignLabelOrder = ['dx', 'dy', 'dz', 'angle', 'zoom']
         alignParams = {}
@@ -1034,14 +1034,14 @@ class ControlPanel(wx.Panel):
                     alignParams[wavelength][4] = 1.0
                 alignParams[wavelength][alignLabelOrder.index(field)] = value
         handle.close()
-        
+
         # Check for users loading 2D cropping parameters.
         if cropParams[5] - cropParams[4] == 0:
             wx.MessageDialog(self,
                     "The Z cropping parameters are invalid; the file must " +
-                    "have at least one Z slice. I am incrementing the Z " + 
+                    "have at least one Z slice. I am incrementing the Z " +
                     "maximum by 1.",
-                    "Invalid Z cropping parameters", 
+                    "Invalid Z cropping parameters",
                     wx.OK | wx.STAY_ON_TOP | wx.ICON_EXCLAMATION).ShowModal()
             cropParams[5] += 1
         self.cropControlPanel.setParams(cropParams)
@@ -1055,7 +1055,7 @@ class ControlPanel(wx.Panel):
         self.updateCrop()
 
 
-    ## Re-generate our various views from the data. 
+    ## Re-generate our various views from the data.
     # We need a lock around this function as a whole so that
     # we don't get concurrent view-update calls.
     # Can't do this in parallel because the OpenGL calls aren't threadsafe.
@@ -1069,8 +1069,8 @@ class ControlPanel(wx.Panel):
                 self.updateViewerDisplay(viewer)
 
 
-    ## Update the images displayed in the specified viewer by taking an 
-    # appropriate slice out of the data. This can take some time, if the 
+    ## Update the images displayed in the specified viewer by taking an
+    # appropriate slice out of the data. This can take some time, if the
     # DataDoc has to do expensive transformations to retrieve the relevant
     # data.
     def updateViewerDisplay(self, viewer):
@@ -1078,39 +1078,39 @@ class ControlPanel(wx.Panel):
         axes_set = set((4, 3, 2, 1))
         axesNormal = list(axes_set.difference(set(viewer.axes)))
         targetCoords = self.dataDoc.getSliceCoords(axesNormal)
-        # We can save processing power if we offload transformations to 
+        # We can save processing power if we offload transformations to
         # OpenGL whenever feasible. That basically is limited to the XY
-        # slice when there's no Z translation, or the YZ/XZ slices when 
+        # slice when there's no Z translation, or the YZ/XZ slices when
         # there's no transformation at all.
         shouldTransform = False
         if viewer.axes == (4, 3) and self.dataDoc.hasZMotion():
             shouldTransform = True
         elif viewer.axes != (4, 3) and self.dataDoc.hasTransformation():
             shouldTransform = True
-            
+
         # Only do this if we've generated a full list of images already.
         if not shouldTransform and len(viewer.imgList) == self.dataDoc.numWavelengths:
             # Ensure that the viewer is applying its own transformations.
             for wavelength in xrange(self.dataDoc.numWavelengths):
                 dx, dy, dz, angle, zoom = self.alignParamsPanels[wavelength].getParamsList()
-                # NB this only works because we know that we only apply 
+                # NB this only works because we know that we only apply
                 # viewer transformations to the XY slice.
                 viewer.changeImgOffset(wavelength, dx, dy, angle, zoom, False)
 
         # If necessary, take a projected slice.
         imageSlice = None
-        if (viewer.axes in self.axesToProjectionMap and 
+        if (viewer.axes in self.axesToProjectionMap and
                 self.axesToProjectionMap[viewer.axes]):
             imageSlice = self.dataDoc.takeProjectedSlice(targetCoords, self.axesToProjectionMap[viewer.axes], shouldTransform)
         else:
             imageSlice = self.dataDoc.takeSlice(targetCoords, shouldTransform)
-            
+
         # HACK: For now, transpose the YZ view so Y is vertical. Later we
         # want to make this a property of the viewer
         if viewer.axes == (2, 3):
             imageSlice = imageSlice.transpose(0, 2, 1)
         viewer.addImgL(imageSlice)
-        
+
         if shouldTransform:
             # OpenGL transforms should not be used since the slice already
             # covers all that, so clear the viewer's transforms.
@@ -1125,7 +1125,7 @@ class ControlPanel(wx.Panel):
         return self.isViewCropped
 
 
-    ## Push a new set of cropping parameters to self.cropControlPanel, as 
+    ## Push a new set of cropping parameters to self.cropControlPanel, as
     # received from one of our viewers when the user drags the crop box around.
     def updateCropboxEdit(self):
         newParams = []
@@ -1133,7 +1133,7 @@ class ControlPanel(wx.Panel):
             newParams.append(self.dataDoc.cropMin[4 - i])
             newParams.append(self.dataDoc.cropMax[4 - i])
         self.cropControlPanel.setParams(newParams)
-    
+
 
     ## Receive a new set of cropping parameters from self.cropControlPanel and
     # apply them to the data and our viewers.
@@ -1212,7 +1212,7 @@ class ControlPanel(wx.Panel):
     def moveSliceLines(self, offset):
         self.dataDoc.moveSliceLines(offset)
         updatedViews = []
-        # Find viewers that don't view along the axes modified by offset, 
+        # Find viewers that don't view along the axes modified by offset,
         # since they'll need new arrays to display.
         for viewer in self.viewers:
             for axis, delta in enumerate(offset):
@@ -1262,16 +1262,16 @@ class ControlPanel(wx.Panel):
         self.parent.SetSize((-1, 250 + 111 * self.dataDoc.numWavelengths))
 
 
-## This class is a small panel that contains alignment parameter controls 
+## This class is a small panel that contains alignment parameter controls
 # (X, Y, and Z translate; rotate about Z axis; zoom)
 class AlignParamsPanel(wx.Panel):
     ## Instantiate the panel.
     # \param helpFunc Function to call to set up on-hover help display.
     # \param params Default values for alignment parameters.
-    # \param isFirstPanel True if this is the first alignment panel to be 
+    # \param isFirstPanel True if this is the first alignment panel to be
     #        created; causes some controls to default to on.
-    def __init__(self, parent, helpFunc, params, 
-            changeCallback, checkCallback, radioCallback, 
+    def __init__(self, parent, helpFunc, params,
+            changeCallback, checkCallback, radioCallback,
             isFirstPanel = False, *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
@@ -1281,7 +1281,7 @@ class AlignParamsPanel(wx.Panel):
 
         ## Function to call when parameters are changed.
         self.changeCallback = changeCallback
-        ## Function to call when mouse-control checkbox is clicked. 
+        ## Function to call when mouse-control checkbox is clicked.
         self.checkCallback = checkCallback
         ## Function to call when radio button is clicked.
         self.radioCallback = radioCallback
@@ -1301,7 +1301,7 @@ class AlignParamsPanel(wx.Panel):
                     shouldRightAlignInput = True)
             control.Bind(wx.EVT_TEXT_ENTER, lambda event: self.changeCallback())
             action = label.replace('ate', 'ation')
-            helpFunc(control, label, 
+            helpFunc(control, label,
                     "Set the %s parameter for alignment of this wavelength relative to the reference wavelength." % action)
             self.controls.append(control)
             if i == 2:
@@ -1311,14 +1311,14 @@ class AlignParamsPanel(wx.Panel):
 
         resetButton = wx.Button(self, -1, "Reset")
         resetButton.Bind(wx.EVT_BUTTON, self.resetParams)
-        helpFunc(resetButton, "Reset", 
+        helpFunc(resetButton, "Reset",
                 "Resets all alignment parameters to their defaults"
         )
         columnSizer.Add(resetButton, 0, wx.ALIGN_RIGHT)
 
         rowSizer.Add(columnSizer)
         sizer.Add(rowSizer)
-        
+
         rowSizer = wx.BoxSizer(wx.HORIZONTAL)
         checkbox = wx.CheckBox(self, label = "Control with mouse")
         helpFunc(checkbox, "Control with mouse",
@@ -1330,18 +1330,18 @@ class AlignParamsPanel(wx.Panel):
         checkbox.SetValue(isFirstPanel)
         rowSizer.Add(checkbox)
 
-        ## A radio button to let the user mark this specific wavelength as 
+        ## A radio button to let the user mark this specific wavelength as
         # the one that other wavelengths are aligned against. Only one
         # wavelength can be so specified at a time, but since the radio buttons
         # are contained in separate panels, we have to turn them on and off
         # manually using self.radioCallback. Currently this is buggy in Linux,
         # so they have to be replaced by checkboxes there.
-        self.shouldUseAsReferenceControl = wx.RadioButton(self, 
+        self.shouldUseAsReferenceControl = wx.RadioButton(self,
                 -1, "Use as auto-alignment reference")
-        helpFunc(self.shouldUseAsReferenceControl, 
+        helpFunc(self.shouldUseAsReferenceControl,
                 "Use as auto-alignment reference",
                 "If set, then this wavelength is used as the fixed reference " +
-                "wavelength that the other wavelengths attempt to align " + 
+                "wavelength that the other wavelengths attempt to align " +
                 "against, when running the Simplex auto-alignment process."
         )
         self.shouldUseAsReferenceControl.SetValue(isFirstPanel)
@@ -1383,15 +1383,15 @@ class AlignParamsPanel(wx.Panel):
 class CropControlPanel(wx.Panel):
     ## Instantiate the panel.
     # \param helpFunc Function to call to set up on-hover help text.
-    # \param dimensions Size of the image we are manipulating (determines 
+    # \param dimensions Size of the image we are manipulating (determines
     #        default cropping parameters).
     # \param toggleCropCallback Function to call when the "toggle crop" button
     #        is clicked.
     # \param textChangeCallback Function to call when the parameters are changed
-    def __init__(self, parent, helpFunc, dimensions, toggleCropCallback, 
+    def __init__(self, parent, helpFunc, dimensions, toggleCropCallback,
                  textChangeCallback, *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
-        
+
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(wx.StaticText(self, -1, "Crop parameters:"))
         self.controls = []
@@ -1405,7 +1405,7 @@ class CropControlPanel(wx.Panel):
                     # Is a maximum; use the image size
                     defaultValue = str(dimensions[index / 2])
                 label = "%s %s:" % (dimension, mode)
-                control = util.addLabeledInput(self, rowSizer, 
+                control = util.addLabeledInput(self, rowSizer,
                         label = label,
                         size = (40, -1), minSize = (80, -1), border = 3,
                         shouldRightAlignInput = True,
@@ -1413,7 +1413,7 @@ class CropControlPanel(wx.Panel):
                         style = wx.TE_PROCESS_ENTER,
                 )
                 control.Bind(wx.EVT_TEXT_ENTER, lambda event: textChangeCallback())
-                helpFunc(control, label, 
+                helpFunc(control, label,
                         ("Set the %s extent for cropping in the %s direction." %
                         (mode.lower(), dimension)) +
                         " You can also adjust this by dragging the cropbox " +
@@ -1441,4 +1441,3 @@ class CropControlPanel(wx.Panel):
     def setParams(self, params):
         for i, param in enumerate(params):
             self.controls[i].SetValue(str(param))
-
