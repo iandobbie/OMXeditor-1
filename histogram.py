@@ -79,7 +79,7 @@ class HistogramCanvas(wx.glcanvas.GLCanvas):
         self.SetCurrent(self.context)
         
         if not self.haveInitedOpenGL:
-            self.width, self.height = self.GetClientSizeTuple()
+            self.width, self.height = wx.Window.GetClientSize(self)
             glClearColor(0, 0, 0, 0)
             self.haveInitedOpenGL = True
 
