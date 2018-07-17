@@ -63,7 +63,6 @@ class GLViewer(wx.glcanvas.GLCanvas):
                  viewManager = None,
                  style = 0, size = wx.DefaultSize):
         wx.glcanvas.GLCanvas.__init__(self, parent, style = style, size = size)
-
         ## DataDoc instance holding the data we show.
         self.dataDoc = dataDoc
 
@@ -123,7 +122,7 @@ class GLViewer(wx.glcanvas.GLCanvas):
     
         
     def InitGL(self):
-        self.w, self.h = self.GetClientSizeTuple()
+        self.w, self.h = wx.Window.GetClientSize(self)
         self.SetCurrent(self.context)
         glClearColor(0.3, 0.3, 0.3, 0.0)   ## background color
 
